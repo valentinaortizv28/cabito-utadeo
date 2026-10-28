@@ -1,6 +1,7 @@
 package modelo.items;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -237,6 +238,45 @@ public class Inventario {
      */
     public boolean estaEquipado(String nombre) {
         return equipados.contains(nombre);
+    }
+
+    /**
+     * @return copia de solo lectura del mapa nombre → cantidad (para guardar la partida)
+     */
+    public Map<String, Integer> getCantidades() {
+        return Collections.unmodifiableMap(new LinkedHashMap<>(cantidades));
+    }
+
+    /**
+     * @return copia de solo lectura de los accesorios equipados (para guardar la partida)
+     */
+    public Set<String> getEquipados() {
+        return Collections.unmodifiableSet(new LinkedHashSet<>(equipados));
+    }
+
+    /**
+     * Reemplaza todo el contenido del inventario con datos guardados, sin
+     * aplicar efectos (por ejemplo, el Saco no vuelve a dar +10 de felicidad).
+     * Se ignoran los objetos que no existen en el catálogo, las cantidades
+     * no positivas y los "equipados" que no son accesorios del inventario.
+     *
+     * @param nuevasCantidades mapa nombre → cantidad
+     * @param nuevosEquipados  nombres de los accesorios equipados
+     */
+    public void restaurar(Map<String, Integer> nuevasCantidades, Iterable<String> nuevosEquipados) {
+        cantidades.clear();
+        equipados.clear();
+        for (Map.Entry<String, Integer> entrada : nuevasCantidades.entrySet()) {
+            Integer cantidad = entrada.getValue();
+            if (Catalogo.buscar(entrada.getKey()) != null && cantidad != null && cantidad > 0) {
+                cantidades.put(entrada.getKey(), cantidad);
+            }
+        }
+        for (String nombre : nuevosEquipados) {
+            if (Catalogo.buscar(nombre) instanceof Accesorio && tiene(nombre)) {
+                equipados.add(nombre);
+            }
+        }
     }
 
     /**

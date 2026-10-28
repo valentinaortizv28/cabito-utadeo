@@ -1,7 +1,9 @@
 package modelo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -248,6 +250,43 @@ public class Partida {
     }
 
     /**
+     * Devuelve el progreso en los mundos, en el orden de los mundos (para
+     * que el archivo guardado salga siempre igual).
+     *
+     * @return copia de solo lectura: nombre del mundo → actividades hechas
+     */
+    public Map<String, Integer> getActividadesPorMundo() {
+        Map<String, Integer> copia = new LinkedHashMap<>();
+        for (Mundo mundo : mundos) {
+            Integer veces = actividadesPorMundo.get(mundo.getNombre());
+            if (veces != null) {
+                copia.put(mundo.getNombre(), veces);
+            }
+        }
+        return Collections.unmodifiableMap(copia);
+    }
+
+    /**
+     * Restaura el progreso guardado en los mundos (al cargar una partida).
+     * Si el mundo actual guardado no existe o está bloqueado para el nivel
+     * de Cabito, la partida queda en La Brújula.
+     *
+     * @param nombreMundoActual mundo donde estaba Cabito
+     * @param actividades       nombre del mundo → actividades hechas
+     */
+    public void restaurarProgreso(String nombreMundoActual, Map<String, Integer> actividades) {
+        actividadesPorMundo.clear();
+        for (Map.Entry<String, Integer> entrada : actividades.entrySet()) {
+            Integer veces = entrada.getValue();
+            if (buscarMundo(entrada.getKey()) != null && veces != null && veces > 0) {
+                actividadesPorMundo.put(entrada.getKey(), veces);
+            }
+        }
+        Mundo mundo = buscarMundo(nombreMundoActual);
+        mundoActual = (mundo != null && estaDesbloqueado(mundo)) ? mundo.getNombre() : Brujula.NOMBRE;
+    }
+
+    /**
      * Devuelve cuántas veces se ha hecho la actividad de un mundo.
      *
      * @param nombreMundo nombre del mundo
@@ -396,6 +435,19 @@ public class Partida {
      */
     public List<Mundo> getMundos() {
         return mundos;
+    }
+
+    /**
+     * @return los mundos a los que Cabito ya puede entrar según su nivel
+     */
+    public List<Mundo> getMundosDesbloqueados() {
+        List<Mundo> desbloqueados = new ArrayList<>();
+        for (Mundo mundo : mundos) {
+            if (estaDesbloqueado(mundo)) {
+                desbloqueados.add(mundo);
+            }
+        }
+        return desbloqueados;
     }
 
     /**
