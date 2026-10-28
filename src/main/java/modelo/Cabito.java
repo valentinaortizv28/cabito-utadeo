@@ -1,11 +1,20 @@
 package modelo;
 
+import modelo.items.Accesorio;
+import modelo.items.Actividad;
+import modelo.items.Bonus;
+import modelo.items.Catalogo;
+import modelo.items.Comida;
+import modelo.items.Inventario;
+import modelo.items.Item;
+
 /**
  * Cabito, la mascota virtual de la Universidad Jorge Tadeo Lozano.
  * <p>
  * Tiene cinco atributos de estado en el rango 0–100, donde 100 siempre es
  * "bien": saciedad (lo contrario del hambre), energía, felicidad, higiene e
- * inteligencia. También tiene nivel y experiencia.
+ * inteligencia. También tiene nivel, experiencia y un {@link Inventario}
+ * con sus monedas y objetos.
  * <p>
  * Esta clase no conoce el reloj del juego: el controlador llama a
  * {@link #pasarTiempo()} cada 10 segundos. Así el modelo no depende de Swing
@@ -55,6 +64,8 @@ public class Cabito {
     private int experiencia;
     private boolean dormido;
     private Estado estado;
+    private int contadorTics;
+    private final Inventario inventario;
 
     /**
      * Crea un Cabito nuevo con los valores iniciales de una partida.
@@ -71,6 +82,8 @@ public class Cabito {
         this.nivel = 1;
         this.experiencia = 0;
         this.dormido = false;
+        this.contadorTics = 0;
+        this.inventario = new Inventario();
         actualizarEstado();
     }
 
@@ -86,24 +99,51 @@ public class Cabito {
      *   <li>Siempre: higiene −2 y felicidad −1.</li>
      *   <li>Si después de esto la saciedad o la higiene quedan por debajo
      *       de 20, la felicidad baja 2 más.</li>
+     *   <li>Con la Gorra UTadeo equipada la felicidad baja la mitad, y con el
+     *       Termo Tadeísta la energía baja la mitad.</li>
      * </ul>
      * Al final recalcula el estado.
      */
     public void pasarTiempo() {
+        contadorTics++;
         if (dormido) {
             setSaciedad(saciedad - BAJA_SACIEDAD_DORMIDO);
             setEnergia(energia + SUBE_ENERGIA_DORMIDO);
         } else {
             setSaciedad(saciedad - BAJA_SACIEDAD);
-            setEnergia(energia - BAJA_ENERGIA);
+            setEnergia(energia - reducirConBonus(BAJA_ENERGIA, Bonus.ENERGIA_LENTA));
         }
         setHigiene(higiene - BAJA_HIGIENE);
-        setFelicidad(felicidad - BAJA_FELICIDAD);
 
+        int bajaFelicidad = BAJA_FELICIDAD;
         if (saciedad < UMBRAL_DESCUIDO || higiene < UMBRAL_DESCUIDO) {
-            setFelicidad(felicidad - BAJA_FELICIDAD_EXTRA);
+            bajaFelicidad += BAJA_FELICIDAD_EXTRA;
         }
+        setFelicidad(felicidad - reducirConBonus(bajaFelicidad, Bonus.FELICIDAD_LENTA));
         actualizarEstado();
+    }
+
+    /**
+     * Reduce a la mitad una bajada de atributo si el bonus está activo.
+     * <p>
+     * Como los atributos son enteros, la mitad de un número impar no es
+     * exacta: se redondea hacia abajo en los tics pares y hacia arriba en los
+     * impares. Así, en promedio, baja exactamente la mitad (una bajada de 1
+     * se aplica un tic sí y otro no).
+     *
+     * @param bajada cuánto bajaría el atributo sin bonus
+     * @param bonus  bonus que reduce esta bajada
+     * @return la bajada que se aplica en este tic
+     */
+    private int reducirConBonus(int bajada, Bonus bonus) {
+        if (!inventario.tieneBonus(bonus)) {
+            return bajada;
+        }
+        int mitad = bajada / 2;
+        if (bajada % 2 != 0 && contadorTics % 2 == 1) {
+            mitad++;
+        }
+        return mitad;
     }
 
     /**
@@ -173,6 +213,7 @@ public class Cabito {
 
     /**
      * Juega con Cabito: felicidad +15, energía −10, higiene −5 y +10 XP.
+     * Si tiene el Balón Tadeísta, gana felicidad extra.
      * No se puede jugar si está dormido o enfermo.
      *
      * @return {@code true} si pudo jugar; {@code false} si el estado no lo permite
@@ -184,6 +225,7 @@ public class Cabito {
         setFelicidad(felicidad + JUGAR_FELICIDAD);
         setEnergia(energia - JUGAR_ENERGIA);
         setHigiene(higiene - JUGAR_HIGIENE);
+        inventario.aplicarJuguetes(Actividad.JUGAR, this);
         ganarExperiencia(JUGAR_XP);
         actualizarEstado();
         return true;
@@ -203,6 +245,44 @@ public class Cabito {
         setFelicidad(felicidad - BANAR_FELICIDAD);
         actualizarEstado();
         return true;
+    }
+
+    /**
+     * Le da de comer a Cabito una comida del inventario.
+     *
+     * @param nombreComida nombre de la comida, por ejemplo {@link Catalogo#EMPANADA}
+     * @return {@code false} si no es comida, no la tiene o el estado no lo permite
+     */
+    public boolean alimentar(String nombreComida) {
+        if (!(Catalogo.buscar(nombreComida) instanceof Comida)) {
+            return false;
+        }
+        return usarItem(nombreComida);
+    }
+
+    /**
+     * Usa un objeto del inventario: los consumibles se gastan y los
+     * accesorios se equipan. Reglas según el estado:
+     * <ul>
+     *   <li>DORMIDO: no se puede usar nada.</li>
+     *   <li>ENFERMO: se pueden usar comida y artículos de cuidado (como el
+     *       botiquín), pero no equipar accesorios.</li>
+     * </ul>
+     *
+     * @param nombre nombre del objeto
+     * @return {@code true} si el objeto se usó
+     */
+    public boolean usarItem(String nombre) {
+        if (estado.soloPermiteDespertar()) {
+            return false;
+        }
+        Item item = Catalogo.buscar(nombre);
+        if (item instanceof Accesorio && estado == Estado.ENFERMO) {
+            return false;
+        }
+        boolean usado = inventario.usar(nombre, this);
+        actualizarEstado();
+        return usado;
     }
 
     // ------------------------------------------------------------------
@@ -391,6 +471,13 @@ public class Cabito {
      */
     public boolean isDormido() {
         return dormido;
+    }
+
+    /**
+     * @return inventario con las monedas y los objetos de Cabito
+     */
+    public Inventario getInventario() {
+        return inventario;
     }
 
     /**
