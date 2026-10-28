@@ -78,6 +78,16 @@ public enum Estado {
     }
 
     /**
+     * Indica si Cabito puede hacer las actividades de los mundos en este
+     * estado. Sigue la misma regla que jugar.
+     *
+     * @return {@code false} si está dormido o enfermo
+     */
+    public boolean permiteActividades() {
+        return permiteJugar();
+    }
+
+    /**
      * Indica si Cabito puede entrar a un minijuego en este estado.
      *
      * @return {@code false} si está dormido, enfermo o cansado
