@@ -474,6 +474,16 @@ public class Cabito {
     }
 
     /**
+     * Cambia directamente si Cabito está dormido (al cargar una partida).
+     * No recalcula el estado: hay que llamar a {@link #actualizarEstado()}.
+     *
+     * @param dormido {@code true} si estaba dormido al guardar
+     */
+    public void setDormido(boolean dormido) {
+        this.dormido = dormido;
+    }
+
+    /**
      * @return inventario con las monedas y los objetos de Cabito
      */
     public Inventario getInventario() {

@@ -59,6 +59,22 @@ public class Historial {
     }
 
     /**
+     * Reemplaza el historial con datos guardados (al cargar una partida).
+     * Si hay más acciones que el máximo, se conservan las más recientes.
+     *
+     * @param nuevasAcciones acciones, de la más antigua a la más nueva
+     * @param nuevosLogros   logros, del más antiguo al más nuevo
+     */
+    public void restaurar(List<String> nuevasAcciones, List<String> nuevosLogros) {
+        acciones.clear();
+        logros.clear();
+        for (String accion : nuevasAcciones) {
+            registrar(accion);
+        }
+        logros.addAll(nuevosLogros);
+    }
+
+    /**
      * Devuelve todas las acciones guardadas, de la más antigua a la más nueva.
      *
      * @return lista de solo lectura
