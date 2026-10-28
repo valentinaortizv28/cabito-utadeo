@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import minijuegos.Minijuego;
+import minijuegos.MinijuegoMemoria;
+import minijuegos.MinijuegoPreguntas;
 import modelo.items.Catalogo;
 import modelo.items.Item;
 import modelo.items.ResultadoCompra;
@@ -252,6 +255,77 @@ public class Partida {
      */
     public int getActividadesRealizadas(String nombreMundo) {
         return actividadesPorMundo.getOrDefault(nombreMundo, 0);
+    }
+
+    // ------------------------------------------------------------------
+    // Minijuegos
+    // ------------------------------------------------------------------
+
+    /**
+     * Indica si Cabito puede jugar un minijuego: su mundo debe estar
+     * desbloqueado y el estado debe permitirlo (no dormido, enfermo ni cansado).
+     *
+     * @param minijuego minijuego a revisar
+     * @return {@code true} si se puede jugar
+     */
+    public boolean puedeJugar(Minijuego minijuego) {
+        Mundo mundo = buscarMundo(minijuego.getNombreMundo());
+        return mundo != null && estaDesbloqueado(mundo) && cabito.getEstado().permiteMinijuegos();
+    }
+
+    /**
+     * Explica por qué no se puede jugar un minijuego.
+     *
+     * @param minijuego minijuego a revisar
+     * @return el motivo, o un texto vacío si sí se puede jugar
+     */
+    public String getMotivoNoPuedeJugar(Minijuego minijuego) {
+        Mundo mundo = buscarMundo(minijuego.getNombreMundo());
+        if (mundo != null && !estaDesbloqueado(mundo)) {
+            return minijuego.getNombre() + ": " + mundo.getMensajeBloqueado() + ".";
+        }
+        if (!cabito.getEstado().permiteMinijuegos()) {
+            return cabito.getNombre() + " no puede jugar ahora: " + cabito.getEstado().getDescripcion();
+        }
+        return "";
+    }
+
+    /**
+     * Crea un juego de memoria nuevo usando el generador aleatorio de la partida.
+     *
+     * @return el minijuego listo para jugar
+     */
+    public MinijuegoMemoria crearMinijuegoMemoria() {
+        return new MinijuegoMemoria(random);
+    }
+
+    /**
+     * Crea un juego de preguntas nuevo usando el generador aleatorio de la partida.
+     *
+     * @return el minijuego listo para jugar
+     */
+    public MinijuegoPreguntas crearMinijuegoPreguntas() {
+        return new MinijuegoPreguntas(random);
+    }
+
+    /**
+     * Entrega el premio de un minijuego terminado: suma las monedas y la
+     * experiencia, lo anota en el historial y revisa si Cabito subió de nivel.
+     * Se debe llamar una sola vez por partida de minijuego.
+     *
+     * @param minijuego minijuego que se jugó
+     * @return {@code false} si el minijuego no había terminado
+     */
+    public boolean entregarPremio(Minijuego minijuego) {
+        if (!minijuego.estaTerminado()) {
+            return false;
+        }
+        int nivelAntes = cabito.getNivel();
+        cabito.getInventario().agregarMonedas(minijuego.calcularMonedas());
+        cabito.ganarExperiencia(minijuego.calcularExperiencia());
+        historial.registrar(minijuego.getNombre() + ": " + minijuego.getResumen());
+        revisarSubidaDeNivel(nivelAntes);
+        return true;
     }
 
     // ------------------------------------------------------------------
