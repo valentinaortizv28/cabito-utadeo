@@ -8,6 +8,7 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import controlador.Animacion;
 import controlador.JuegoController;
 import controlador.OpcionSalir;
 import controlador.VistaJuego;
@@ -78,6 +79,13 @@ public class VistaSwing implements VistaJuego {
     }
 
     @Override
+    public void animar(Animacion animacion) {
+        if (ventanaPrincipal != null) {
+            ventanaPrincipal.animar(animacion);
+        }
+    }
+
+    @Override
     public void mostrarAviso(String titulo, String texto) {
         JOptionPane.showMessageDialog(ventanaActiva(), texto, titulo, JOptionPane.INFORMATION_MESSAGE);
     }
@@ -134,7 +142,17 @@ public class VistaSwing implements VistaJuego {
         dialogo.setContentPane(panel);
         dialogo.setSize(680, 640);
         dialogo.setLocationRelativeTo(ventanaActiva());
-        dialogo.setVisible(true);
+        // Mientras dura el minijuego, Cabito aparece corriendo en la ventana principal.
+        if (ventanaPrincipal != null) {
+            ventanaPrincipal.setPoseMinijuego(true);
+        }
+        try {
+            dialogo.setVisible(true);   // el diálogo es modal: esta línea espera a que se cierre
+        } finally {
+            if (ventanaPrincipal != null) {
+                ventanaPrincipal.setPoseMinijuego(false);
+            }
+        }
     }
 
     @Override

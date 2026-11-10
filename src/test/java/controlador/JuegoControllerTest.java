@@ -156,6 +156,7 @@ class JuegoControllerTest {
         assertEquals(85, cabito.getFelicidad());
         assertTrue(vista.actualizaciones > antes);
         assertTrue(vista.ultimoDialogo.startsWith("¡Qué divertido!"));
+        assertEquals(List.of(Animacion.JUGAR), vista.animaciones);
     }
 
     @Test
@@ -166,6 +167,7 @@ class JuegoControllerTest {
         cabito.actualizarEstado();
         controlador.jugar();
         assertTrue(vista.ultimoDialogo.contains(Estado.ENFERMO.getDescripcion()));
+        assertTrue(vista.animaciones.isEmpty());
     }
 
     @Test
@@ -231,6 +233,17 @@ class JuegoControllerTest {
         empezar();
         controlador.viajarA(Biblioteca.NOMBRE);
         assertTrue(vista.ultimoAviso().contains("Nivel 2 requerido"));
+        assertTrue(vista.animaciones.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Viajar a un mundo desbloqueado hace que Cabito llegue caminando")
+    void viajarDesbloqueado() {
+        Cabito cabito = empezar();
+        cabito.setNivel(2);
+        controlador.viajarA(Biblioteca.NOMBRE);
+        assertEquals(Biblioteca.NOMBRE, controlador.getPartida().getMundoActual().getNombre());
+        assertEquals(List.of(Animacion.VIAJAR), vista.animaciones);
     }
 
     @Test

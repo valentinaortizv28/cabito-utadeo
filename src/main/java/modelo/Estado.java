@@ -4,41 +4,39 @@ package modelo;
  * Estados automáticos en los que puede estar Cabito.
  * <p>
  * El estado no lo elige el usuario: lo calcula {@link Cabito#actualizarEstado()}
- * a partir de los atributos. Cada estado define qué imagen se muestra y qué
+ * a partir de los atributos. Cada estado define la frase de Cabito y qué
  * acciones están permitidas, de modo que la vista y el controlador solo tienen
- * que preguntarle al estado.
+ * que preguntarle al estado. La imagen de cada estado la decide la vista
+ * ({@code vista.Pose}), porque el modelo no sabe nada de imágenes.
  */
 public enum Estado {
 
     /** Cabito está durmiendo; solo se le puede despertar. */
-    DORMIDO("Zzz... déjame dormir un rato más.", "cabito_dormido.png"),
+    DORMIDO("Zzz... déjame dormir un rato más."),
     /** Saciedad o higiene muy bajas; necesita cuidados urgentes. */
-    ENFERMO("No me siento bien... necesito que me cuides.", "cabito_enfermo.png"),
+    ENFERMO("No me siento bien... necesito que me cuides."),
     /** Saciedad baja. */
-    HAMBRIENTO("¡Tengo hambre! ¿Vamos a la cafetería?", "cabito_hambriento.png"),
+    HAMBRIENTO("¡Tengo hambre! ¿Vamos a la cafetería?"),
     /** Energía baja. */
-    CANSADO("Estoy muy cansado...", "cabito_cansado.png"),
+    CANSADO("Estoy muy cansado..."),
     /** Higiene baja. */
-    SUCIO("Creo que necesito un baño.", "cabito_sucio.png"),
+    SUCIO("Creo que necesito un baño."),
     /** Felicidad baja. */
-    TRISTE("Me siento un poco triste.", "cabito_triste.png"),
+    TRISTE("Me siento un poco triste."),
     /** Felicidad alta y todo lo demás en buen nivel. */
-    FELIZ("¡Qué buen día en la Tadeo!", "cabito_feliz.png"),
+    FELIZ("¡Qué buen día en la Tadeo!"),
     /** Ningún otro estado aplica. */
-    NORMAL("¡Hola! ¿Qué hacemos hoy?", "cabito_normal.png");
+    NORMAL("¡Hola! ¿Qué hacemos hoy?");
 
     private final String descripcion;
-    private final String nombreImagen;
 
     /**
-     * Crea un estado con su mensaje y su imagen.
+     * Crea un estado con su mensaje.
      *
-     * @param descripcion  frase que dice Cabito en este estado
-     * @param nombreImagen nombre del archivo en {@code src/main/resources/img/}
+     * @param descripcion frase que dice Cabito en este estado
      */
-    Estado(String descripcion, String nombreImagen) {
+    Estado(String descripcion) {
         this.descripcion = descripcion;
-        this.nombreImagen = nombreImagen;
     }
 
     /**
@@ -48,15 +46,6 @@ public enum Estado {
      */
     public String getDescripcion() {
         return descripcion;
-    }
-
-    /**
-     * Devuelve el nombre del archivo de imagen asociado a este estado.
-     *
-     * @return nombre del archivo PNG, por ejemplo {@code "cabito_feliz.png"}
-     */
-    public String getNombreImagen() {
-        return nombreImagen;
     }
 
     /**

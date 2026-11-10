@@ -12,10 +12,9 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import controlador.JuegoController;
-import modelo.Estado;
 
 /**
- * Pantalla inicial: título, Cabito feliz y los botones "Nueva partida" y
+ * Pantalla inicial: título, el retrato de Cabito y los botones "Nueva partida" y
  * "Cargar partida".
  */
 public class PantallaInicio extends JFrame {
@@ -47,7 +46,7 @@ public class PantallaInicio extends JFrame {
         contenido.add(encabezado, BorderLayout.NORTH);
 
         DibujoCabito dibujo = new DibujoCabito();
-        dibujo.setEstado(Estado.FELIZ);
+        dibujo.fijarPose(Pose.RETRATO);
         contenido.add(dibujo, BorderLayout.CENTER);
 
         JPanel botones = new JPanel(new FlowLayout(FlowLayout.CENTER, 16, 0));

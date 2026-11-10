@@ -14,20 +14,19 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import controlador.Animacion;
 import controlador.JuegoController;
 import modelo.Cabito;
 import modelo.Estado;
 import modelo.Partida;
-import modelo.items.Catalogo;
-import modelo.items.Inventario;
 import modelo.mundos.Biblioteca;
 import modelo.mundos.Brujula;
 import modelo.mundos.Modulo20;
 import modelo.mundos.Mundo;
 
 /**
- * Centro de la ventana: el fondo del mundo actual, Cabito, su globo de
- * diálogo y los botones de acción.
+ * Centro de la ventana: el fondo del mundo actual, Cabito (con la pose de su
+ * estado y sus animaciones), su globo de diálogo y los botones de acción.
  * <p>
  * Los botones se habilitan o deshabilitan según el estado de Cabito
  * (por ejemplo, dormido solo permite "Despertar").
@@ -84,12 +83,9 @@ public class PanelEscena extends JPanel {
     public void actualizar(Partida partida) {
         Cabito cabito = partida.getCabito();
         Estado estado = cabito.getEstado();
-        Inventario inventario = cabito.getInventario();
         mundo = partida.getMundoActual();
 
         dibujo.setEstado(estado);
-        dibujo.setAccesorios(inventario.estaEquipado(Catalogo.GORRA), inventario.estaEquipado(Catalogo.SACO),
-                inventario.estaEquipado(Catalogo.MOCHILA));
 
         boolean despierto = !estado.soloPermiteDespertar();
         configurar(botonAlimentar, despierto, "Cabito está dormido");
@@ -108,6 +104,38 @@ public class PanelEscena extends JPanel {
         boton.setEnabled(habilitado);
         boton.setBackground(habilitado ? Estilo.TEAL : Estilo.BLOQUEADO);
         boton.setToolTipText(habilitado ? null : motivo);
+    }
+
+    /**
+     * Muestra una animación de Cabito: correr un momento después de jugar, o
+     * entrar caminando al llegar a otro mundo.
+     *
+     * @param animacion animación a mostrar
+     */
+    public void animar(Animacion animacion) {
+        switch (animacion) {
+            case JUGAR:
+                dibujo.mostrarPoseTemporal(Pose.CORRER);
+                break;
+            case VIAJAR:
+                dibujo.animarCaminata();
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * Pone a Cabito corriendo mientras hay un minijuego abierto.
+     *
+     * @param activo {@code true} al abrir el minijuego, {@code false} al cerrarlo
+     */
+    public void setPoseMinijuego(boolean activo) {
+        if (activo) {
+            dibujo.fijarPose(Pose.CORRER);
+        } else {
+            dibujo.soltarPose();
+        }
     }
 
     /**

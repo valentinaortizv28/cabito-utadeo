@@ -11,10 +11,15 @@ import javax.imageio.ImageIO;
 /**
  * Carga imágenes PNG desde {@code src/main/resources/img/}.
  * <p>
- * Si una imagen no existe, devuelve {@code null} y la vista dibuja una
- * figura con Graphics2D en su lugar. Así, para cambiar el aspecto de Cabito
- * o de un mundo basta con poner un PNG con el nombre correcto (por ejemplo
- * {@code cabito_feliz.png} o {@code fondo_biblioteca.png}) en esa carpeta.
+ * Las imágenes se buscan con {@link Class#getResource(String)}, es decir, en
+ * el <i>classpath</i>: así funcionan igual al ejecutar desde IntelliJ (carpeta
+ * {@code target/classes}) que desde un archivo {@code .jar}.
+ * <p>
+ * Si una imagen no existe, devuelve {@code null} y la vista dibuja otra cosa
+ * en su lugar: un fondo sencillo para los mundos, o un aviso para Cabito.
+ * Las poses de Cabito están en {@code img/cabito/} (ver {@link Pose}) y los
+ * fondos opcionales de los mundos se llaman, por ejemplo,
+ * {@code fondo_biblioteca.png}.
  */
 public final class Imagenes {
 

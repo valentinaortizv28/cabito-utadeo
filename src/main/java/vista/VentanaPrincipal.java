@@ -7,6 +7,7 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 
+import controlador.Animacion;
 import controlador.JuegoController;
 import modelo.Partida;
 
@@ -73,6 +74,24 @@ public class VentanaPrincipal extends JFrame {
      */
     public void mostrarDialogo(String texto) {
         escena.setMensaje(texto);
+    }
+
+    /**
+     * Muestra una animación de Cabito en la escena.
+     *
+     * @param animacion animación a mostrar
+     */
+    public void animar(Animacion animacion) {
+        escena.animar(animacion);
+    }
+
+    /**
+     * Pone o quita la pose de minijuego (Cabito corriendo).
+     *
+     * @param activo {@code true} al abrir el minijuego, {@code false} al cerrarlo
+     */
+    public void setPoseMinijuego(boolean activo) {
+        escena.setPoseMinijuego(activo);
     }
 
     /**

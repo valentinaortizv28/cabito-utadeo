@@ -40,6 +40,13 @@ public interface VistaJuego {
     void mostrarDialogo(String texto);
 
     /**
+     * Muestra una animación de Cabito (por ejemplo, correr después de jugar).
+     *
+     * @param animacion animación a mostrar
+     */
+    void animar(Animacion animacion);
+
+    /**
      * Muestra un mensaje informativo en una ventana emergente.
      *
      * @param titulo título de la ventana
