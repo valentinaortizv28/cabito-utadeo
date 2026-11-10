@@ -11,6 +11,7 @@ import javax.swing.SwingUtilities;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import controlador.Animacion;
 import controlador.JuegoController;
 import controlador.OpcionSalir;
 import controlador.VistaJuego;
@@ -34,6 +35,7 @@ class PanelesPrincipalesTest {
         @Override public void mostrarJuego(Partida partida) { }
         @Override public void actualizar(Partida partida) { }
         @Override public void mostrarDialogo(String texto) { }
+        @Override public void animar(Animacion animacion) { }
         @Override public void mostrarAviso(String titulo, String texto) { }
         @Override public void mostrarError(String texto) { }
         @Override public String pedirNombre() { return "Cabito"; }
@@ -72,6 +74,26 @@ class PanelesPrincipalesTest {
             assertFalse(escena.getBotonJugar().isEnabled());
             assertEquals("Despertar", escena.getBotonDormir().getText());
             assertTrue(escena.getBotonDormir().isEnabled());
+        });
+    }
+
+    @Test
+    @DisplayName("Animaciones de la escena: correr al jugar, caminar al viajar, correr en minijuegos")
+    void escenaAnimaciones() throws Exception {
+        enSwing(() -> {
+            Partida partida = new Partida("Cabito");
+            PanelEscena escena = new PanelEscena(controlador());
+            escena.actualizar(partida);
+            assertEquals(Pose.QUIETO, escena.getDibujo().getPose());
+
+            escena.animar(Animacion.JUGAR);
+            assertEquals(Pose.CORRER, escena.getDibujo().getPose());
+
+            escena.animar(Animacion.VIAJAR);
+            assertEquals(Pose.CAMINAR, escena.getDibujo().getPose());
+
+            escena.setPoseMinijuego(true);
+            assertEquals(Pose.CORRER, escena.getDibujo().getPose());
         });
     }
 

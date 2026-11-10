@@ -205,10 +205,12 @@ public class JuegoController {
     // Acciones básicas
     // ------------------------------------------------------------------
 
-    /** Juega con Cabito. */
+    /** Juega con Cabito; si pudo jugar, se le ve corriendo un momento. */
     public void jugar() {
-        ejecutar(() -> partida.jugar(), "¡Qué divertido! ¿Jugamos otra vez?",
-                "Ahora no puedo jugar. " + descripcionEstado());
+        if (ejecutar(() -> partida.jugar(), "¡Qué divertido! ¿Jugamos otra vez?",
+                "Ahora no puedo jugar. " + descripcionEstado())) {
+            vista.animar(Animacion.JUGAR);
+        }
     }
 
     /** Baña a Cabito. */
@@ -316,7 +318,7 @@ public class JuegoController {
     // ------------------------------------------------------------------
 
     /**
-     * Viaja a otro mundo, o avisa por qué no se puede.
+     * Viaja a otro mundo (Cabito llega caminando), o avisa por qué no se puede.
      *
      * @param nombreMundo nombre del mundo
      */
@@ -330,10 +332,12 @@ public class JuegoController {
         }
         if (partida.viajarA(nombreMundo)) {
             vista.mostrarDialogo("¡Llegamos a " + mundo.getNombre() + "! " + mundo.getDescripcion() + ".");
+            vista.actualizar(partida);
+            vista.animar(Animacion.VIAJAR);
         } else {
             vista.mostrarAviso("Mundo bloqueado", mundo.getNombre() + ": " + mundo.getMensajeBloqueado() + ".");
+            vista.actualizar(partida);
         }
-        vista.actualizar(partida);
     }
 
     /**

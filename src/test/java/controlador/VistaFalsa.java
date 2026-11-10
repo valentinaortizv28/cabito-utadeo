@@ -24,6 +24,7 @@ class VistaFalsa implements VistaJuego {
     final List<String> errores = new ArrayList<>();
     final List<List<String>> opcionesOfrecidas = new ArrayList<>();
     Minijuego minijuegoAbierto;
+    final List<Animacion> animaciones = new ArrayList<>();
 
     /** Respuestas que dará pedirNombre(), en orden (null = cancelar). */
     final Deque<String> nombres = new ArrayDeque<>();
@@ -50,6 +51,11 @@ class VistaFalsa implements VistaJuego {
     @Override
     public void mostrarDialogo(String texto) {
         ultimoDialogo = texto;
+    }
+
+    @Override
+    public void animar(Animacion animacion) {
+        animaciones.add(animacion);
     }
 
     @Override
