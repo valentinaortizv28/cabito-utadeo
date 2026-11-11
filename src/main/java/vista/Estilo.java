@@ -7,6 +7,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 
 import javax.swing.BorderFactory;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -47,6 +48,8 @@ public final class Estilo {
 
     /** Ancho del texto de las filas de los diálogos (Swing lo escala un poco). */
     private static final int ANCHO_TEXTO_FILA = 380;
+    /** Ancho del texto de las filas que llevan ícono (el ícono ocupa parte del espacio). */
+    private static final int ANCHO_TEXTO_FILA_CON_ICONO = 320;
 
     /** No se crean objetos de esta clase: todo es estático. */
     private Estilo() {
@@ -115,12 +118,24 @@ public final class Estilo {
      * @return la fila
      */
     public static JPanel crearFila(String html, JComponent... derecha) {
+        return crearFila(html, ANCHO_TEXTO_FILA, derecha);
+    }
+
+    /**
+     * Crea la fila con un ancho de texto dado.
+     *
+     * @param html       contenido de la izquierda en HTML
+     * @param anchoTexto ancho del texto en píxeles
+     * @param derecha    componentes de la derecha
+     * @return la fila
+     */
+    private static JPanel crearFila(String html, int anchoTexto, JComponent... derecha) {
         JPanel fila = new JPanel(new BorderLayout(10, 0));
         fila.setBackground(Color.WHITE);
         fila.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(TEAL_CLARO, 1),
                 BorderFactory.createEmptyBorder(8, 12, 8, 12)));
-        JLabel texto = new JLabel("<html><div style='width:" + ANCHO_TEXTO_FILA + "px'>" + html + "</div></html>");
+        JLabel texto = new JLabel("<html><div style='width:" + anchoTexto + "px'>" + html + "</div></html>");
         texto.setFont(FUENTE);
         fila.add(texto, BorderLayout.CENTER);
         JPanel panelDerecha = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
@@ -129,6 +144,21 @@ public final class Estilo {
             panelDerecha.add(componente);
         }
         fila.add(panelDerecha, BorderLayout.EAST);
+        return fila;
+    }
+
+    /**
+     * Crea una fila como {@link #crearFila(String, JComponent...)} pero con un
+     * ícono a la izquierda (por ejemplo, el ícono del objeto en la tienda).
+     *
+     * @param icono   ícono de la izquierda
+     * @param html    contenido del centro en HTML (sin la etiqueta html)
+     * @param derecha componentes de la derecha
+     * @return la fila
+     */
+    public static JPanel crearFila(Icon icono, String html, JComponent... derecha) {
+        JPanel fila = crearFila(html, ANCHO_TEXTO_FILA_CON_ICONO, derecha);
+        fila.add(new JLabel(icono), BorderLayout.WEST);
         return fila;
     }
 
