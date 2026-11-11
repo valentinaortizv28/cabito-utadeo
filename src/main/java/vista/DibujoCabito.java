@@ -55,6 +55,8 @@ public class DibujoCabito extends JComponent {
     /** Fase del rebote de la caminata, en radianes. */
     private double fasePaso;
     private long inicioCaminata;
+    /** Lo que se hace cuando Cabito termina de caminar (puede ser {@code null}). */
+    private Runnable alLlegar;
     private final Timer temporizadorPose;
     private final Timer temporizadorCaminata;
 
@@ -131,6 +133,7 @@ public class DibujoCabito extends JComponent {
      */
     public void mostrarPoseTemporal(Pose pose) {
         temporizadorCaminata.stop();
+        ejecutarLlegadaPendiente();
         desplazamiento = 0;
         poseTemporal = pose;
         temporizadorPose.restart();
@@ -141,6 +144,19 @@ public class DibujoCabito extends JComponent {
      * Hace que Cabito entre caminando desde la izquierda hasta el centro.
      */
     public void animarCaminata() {
+        animarCaminata(null);
+    }
+
+    /**
+     * Hace que Cabito entre caminando desde la izquierda hasta el centro y,
+     * al llegar, ejecuta una acción (por ejemplo, mostrar los productos de la tienda).
+     *
+     * @param alLlegar acción al terminar la caminata, o {@code null}
+     */
+    public void animarCaminata(Runnable alLlegar) {
+        temporizadorCaminata.stop();
+        ejecutarLlegadaPendiente();
+        this.alLlegar = alLlegar;
         temporizadorPose.stop();
         poseTemporal = Pose.CAMINAR;
         desplazamiento = 1;
@@ -155,6 +171,19 @@ public class DibujoCabito extends JComponent {
      */
     public boolean isAnimando() {
         return poseTemporal != null;
+    }
+
+    /**
+     * Si una caminata dejó pendiente una acción de llegada, la ejecuta (una
+     * sola vez). Así, aunque la caminata se interrumpa, lo que esperaba a
+     * que Cabito llegara (por ejemplo, los productos de la tienda) aparece igual.
+     */
+    private void ejecutarLlegadaPendiente() {
+        if (alLlegar != null) {
+            Runnable accion = alLlegar;
+            alLlegar = null;
+            accion.run();
+        }
     }
 
     /**
@@ -176,6 +205,7 @@ public class DibujoCabito extends JComponent {
             desplazamiento = 0;
             fasePaso = 0;
             terminarPoseTemporal();
+            ejecutarLlegadaPendiente();
             return;
         }
         double suavizado = 1 - (1 - avance) * (1 - avance);

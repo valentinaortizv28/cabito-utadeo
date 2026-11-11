@@ -13,7 +13,7 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 
 /**
- * Base de los diálogos que muestran una lista de filas (tienda, inventario,
+ * Base de los diálogos que muestran una lista de filas (inventario,
  * mundos, minijuegos): un encabezado, la lista con barra de desplazamiento,
  * un mensaje abajo y un botón Cerrar.
  * <p>

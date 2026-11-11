@@ -10,6 +10,11 @@ import modelo.Cabito;
  */
 public class Tienda {
 
+    /** Nombre del lugar, para mostrarlo junto a los mundos. */
+    public static final String NOMBRE = "Tienda Tadeísta";
+    /** Descripción corta del lugar. */
+    public static final String DESCRIPCION = "Merch, comida y cuidado UTadeo";
+
     /**
      * Devuelve todos los objetos que vende la tienda, incluidos los que aún
      * están bloqueados por nivel (la interfaz los muestra como bloqueados).

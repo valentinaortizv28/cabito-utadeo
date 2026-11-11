@@ -20,6 +20,7 @@ import modelo.items.Inventario;
 import modelo.items.Item;
 import modelo.items.Juguete;
 import modelo.items.ResultadoCompra;
+import modelo.items.Tienda;
 import modelo.mundos.Mundo;
 import modelo.mundos.ResultadoActividad;
 import persistencia.GestorPartidas;
@@ -306,11 +307,66 @@ public class JuegoController {
             return ResultadoCompra.NO_EXISTE;
         }
         ResultadoCompra resultado = partida.comprar(nombre);
-        if (resultado == ResultadoCompra.EXITO) {
-            vista.mostrarDialogo("¡Gracias! Ya tengo: " + nombre + ".");
-        }
+        vista.mostrarDialogo(mensajeCompra(resultado, nombre));
         vista.actualizar(partida);
         return resultado;
+    }
+
+    /**
+     * Explica con amabilidad el resultado de una compra, para el globo de
+     * Cabito y para la tienda. Si faltan monedas, dice cuántas y cómo ganarlas.
+     *
+     * @param resultado resultado de la compra
+     * @param nombre    nombre del objeto
+     * @return el mensaje
+     */
+    public String mensajeCompra(ResultadoCompra resultado, String nombre) {
+        Item item = Catalogo.buscar(nombre);
+        switch (resultado) {
+            case EXITO:
+                return "¡Gracias! Ya tengo: " + nombre + ".";
+            case MONEDAS_INSUFICIENTES:
+                int faltan = item.getPrecio() - partida.getCabito().getInventario().getMonedas();
+                return "¡Uy! Me faltan " + faltan + " monedas para " + nombre
+                        + ". Puedo ganar más recorriendo el campus o jugando minijuegos.";
+            case NIVEL_INSUFICIENTE:
+                return nombre + " se desbloquea en el nivel " + item.getNivelRequerido()
+                        + ". ¡Sigamos subiendo de nivel!";
+            case YA_LO_TIENE:
+                return "¡Ya tengo " + nombre + "! No necesito otro.";
+            default:
+                return resultado.getMensaje();
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // Tienda Tadeísta como lugar
+    // ------------------------------------------------------------------
+
+    /**
+     * Lleva a Cabito a la Tienda Tadeísta: camina hasta la tienda y luego
+     * aparecen los productos.
+     */
+    public void irATienda() {
+        if (partida == null || !partida.irATienda()) {
+            return;
+        }
+        vista.mostrarDialogo("¡Vamos a la " + Tienda.NOMBRE + "! Tengo "
+                + partida.getCabito().getInventario().getMonedas() + " monedas.");
+        vista.actualizar(partida);
+        vista.animar(Animacion.ENTRAR_TIENDA);
+    }
+
+    /**
+     * Sale de la tienda y vuelve caminando al mundo de donde vino.
+     */
+    public void salirDeTienda() {
+        if (partida == null || !partida.salirDeTienda()) {
+            return;
+        }
+        vista.mostrarDialogo("¡De vuelta en " + partida.getMundoActual().getNombre() + "!");
+        vista.actualizar(partida);
+        vista.animar(Animacion.VIAJAR);
     }
 
     // ------------------------------------------------------------------

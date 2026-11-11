@@ -157,7 +157,20 @@ public final class Estilo {
      * @return la fila
      */
     public static JPanel crearFila(Icon icono, String html, JComponent... derecha) {
-        JPanel fila = crearFila(html, ANCHO_TEXTO_FILA_CON_ICONO, derecha);
+        return crearFila(icono, html, ANCHO_TEXTO_FILA_CON_ICONO, derecha);
+    }
+
+    /**
+     * Crea una fila con ícono y un ancho de texto dado (para paneles angostos).
+     *
+     * @param icono      ícono de la izquierda
+     * @param html       contenido del centro en HTML (sin la etiqueta html)
+     * @param anchoTexto ancho del texto en píxeles
+     * @param derecha    componentes de la derecha
+     * @return la fila
+     */
+    public static JPanel crearFila(Icon icono, String html, int anchoTexto, JComponent... derecha) {
+        JPanel fila = crearFila(html, anchoTexto, derecha);
         fila.add(new JLabel(icono), BorderLayout.WEST);
         return fila;
     }
