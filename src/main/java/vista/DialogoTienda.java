@@ -13,11 +13,14 @@ import modelo.items.Item;
 import modelo.items.ResultadoCompra;
 
 /**
- * Tienda Tadeísta: lista todos los objetos con su precio y un botón para
- * comprar. Los bloqueados por nivel y los permanentes ya comprados se
+ * Tienda Tadeísta: lista todos los objetos con su ícono, su precio y un
+ * botón para comprar. Los bloqueados por nivel y los permanentes ya comprados se
  * muestran pero no se pueden comprar.
  */
 public class DialogoTienda extends DialogoLista {
+
+    /** Tamaño de los íconos de la tienda en píxeles. */
+    private static final int TAMANO_ICONO = 48;
 
     private final JuegoController controlador;
 
@@ -30,6 +33,8 @@ public class DialogoTienda extends DialogoLista {
     public DialogoTienda(Window padre, JuegoController controlador) {
         super(padre, "Tienda Tadeísta");
         this.controlador = controlador;
+        setSize(800, 620);
+        setLocationRelativeTo(padre);
         refrescar();
     }
 
@@ -61,7 +66,7 @@ public class DialogoTienda extends DialogoLista {
             precio.setForeground(Estilo.AZUL_OSCURO);
             String html = "<b>" + Estilo.escaparHtml(item.getNombre()) + "</b>  <i>(" + item.getTipo() + ")</i><br>"
                     + Estilo.escaparHtml(item.getDescripcion());
-            filas.add(Estilo.crearFila(html, precio,
+            filas.add(Estilo.crearFila(IconosItems.icono(item.getNombre(), TAMANO_ICONO), html, precio,
                     botonFila(textoBoton, desbloqueado && !yaLoTiene, () -> comprar(item))));
         }
     }
