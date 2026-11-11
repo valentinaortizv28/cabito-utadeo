@@ -9,5 +9,7 @@ public enum Animacion {
     /** Cabito acaba de jugar (se le ve corriendo un momento). */
     JUGAR,
     /** Cabito llegó a otro mundo (entra caminando). */
-    VIAJAR
+    VIAJAR,
+    /** Cabito camina hasta la Tienda Tadeísta; después aparecen los productos. */
+    ENTRAR_TIENDA
 }

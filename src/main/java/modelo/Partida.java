@@ -38,6 +38,13 @@ public class Partida {
     private final Historial historial;
     private final Random random;
     private String mundoActual;
+    /**
+     * Si Cabito está dentro de la Tienda Tadeísta. Mientras está ahí,
+     * {@code mundoActual} sigue siendo el mundo de donde vino, que es al
+     * que vuelve al salir. No se guarda en el archivo: al cargar una partida
+     * Cabito aparece en su mundo.
+     */
+    private boolean enTienda;
 
     /**
      * Crea una partida nueva.
@@ -201,18 +208,62 @@ public class Partida {
             return false;
         }
         mundoActual = mundo.getNombre();
+        enTienda = false;
         historial.registrar("Viajaste a " + mundo.getNombre() + ".");
         return true;
+    }
+
+    // ------------------------------------------------------------------
+    // Tienda Tadeísta como lugar
+    // ------------------------------------------------------------------
+
+    /**
+     * Lleva a Cabito a la Tienda Tadeísta. No pide nivel. El mundo actual se
+     * recuerda para volver a él al salir.
+     *
+     * @return {@code false} si ya estaba en la tienda
+     */
+    public boolean irATienda() {
+        if (enTienda) {
+            return false;
+        }
+        enTienda = true;
+        historial.registrar("Entraste a la " + Tienda.NOMBRE + ".");
+        return true;
+    }
+
+    /**
+     * Saca a Cabito de la tienda y lo devuelve al mundo de donde vino.
+     *
+     * @return {@code false} si no estaba en la tienda
+     */
+    public boolean salirDeTienda() {
+        if (!enTienda) {
+            return false;
+        }
+        enTienda = false;
+        historial.registrar("Volviste a " + mundoActual + ".");
+        return true;
+    }
+
+    /**
+     * @return {@code true} si Cabito está dentro de la Tienda Tadeísta
+     */
+    public boolean isEnTienda() {
+        return enTienda;
     }
 
     /**
      * Hace la actividad del mundo actual. Si se hizo, cuenta para el
      * progreso del mundo, se anota en el historial y se revisa si Cabito
-     * subió de nivel.
+     * subió de nivel. Dentro de la tienda no se puede hacer.
      *
      * @return resultado de la actividad
      */
     public ResultadoActividad realizarActividad() {
+        if (enTienda) {
+            return ResultadoActividad.fallo("Primero sal de la " + Tienda.NOMBRE + ".");
+        }
         Mundo mundo = getMundoActual();
         int nivelAntes = cabito.getNivel();
         ResultadoActividad resultado = mundo.realizarActividad(cabito, random);

@@ -225,6 +225,52 @@ class JuegoControllerTest {
         assertTrue(controlador.usarItem(Catalogo.BALON).contains("funcionan solos"));
     }
 
+    // ---------------- Tienda Tadeísta como lugar ----------------
+
+    @Test
+    @DisplayName("Ir a la tienda: Cabito camina hasta ella y lo anuncia")
+    void irATienda() {
+        empezar();
+        controlador.irATienda();
+        assertTrue(controlador.getPartida().isEnTienda());
+        assertEquals(List.of(Animacion.ENTRAR_TIENDA), vista.animaciones);
+        assertTrue(vista.ultimoDialogo.contains("Tienda Tadeísta"));
+        controlador.irATienda(); // ya está: no se repite la animación
+        assertEquals(1, vista.animaciones.size());
+    }
+
+    @Test
+    @DisplayName("Salir de la tienda vuelve caminando al mundo anterior")
+    void salirDeTienda() {
+        empezar();
+        controlador.irATienda();
+        controlador.salirDeTienda();
+        assertFalse(controlador.getPartida().isEnTienda());
+        assertEquals(List.of(Animacion.ENTRAR_TIENDA, Animacion.VIAJAR), vista.animaciones);
+        assertTrue(vista.ultimoDialogo.contains("La Brújula"));
+    }
+
+    @Test
+    @DisplayName("Sin monedas suficientes, Cabito explica con amabilidad cuántas faltan")
+    void comprarSinMonedas() {
+        Cabito cabito = empezar();
+        cabito.getInventario().setMonedas(30);
+        assertEquals(ResultadoCompra.MONEDAS_INSUFICIENTES, controlador.comprar(Catalogo.TERMO));
+        assertTrue(vista.ultimoDialogo.startsWith("¡Uy! Me faltan 50 monedas para Termo Tadeísta."),
+                vista.ultimoDialogo);
+        assertTrue(vista.errores.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Mensajes de compra para cada resultado")
+    void mensajesDeCompra() {
+        empezar();
+        assertTrue(controlador.mensajeCompra(ResultadoCompra.EXITO, Catalogo.TINTO).startsWith("¡Gracias!"));
+        assertTrue(controlador.mensajeCompra(ResultadoCompra.NIVEL_INSUFICIENTE, Catalogo.SACO)
+                .contains("nivel 3"));
+        assertTrue(controlador.mensajeCompra(ResultadoCompra.YA_LO_TIENE, Catalogo.BALON).startsWith("¡Ya tengo"));
+    }
+
     // ---------------- Mundos, niveles y minijuegos ----------------
 
     @Test

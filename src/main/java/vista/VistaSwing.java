@@ -21,7 +21,7 @@ import modelo.Partida;
  * Implementación de {@link VistaJuego} con Swing.
  * <p>
  * Maneja las dos ventanas (pantalla inicial y ventana principal), los
- * mensajes emergentes ({@link JOptionPane}) y abre los diálogos de tienda,
+ * mensajes emergentes ({@link JOptionPane}) y abre los diálogos de
  * inventario, mundos, minijuegos y logros.
  */
 public class VistaSwing implements VistaJuego {
@@ -173,11 +173,6 @@ public class VistaSwing implements VistaJuego {
     /** Abre la lista de mundos. */
     public void abrirMundos() {
         new DialogoMundos(ventanaActiva(), controlador).setVisible(true);
-    }
-
-    /** Abre la Tienda Tadeísta. */
-    public void abrirTienda() {
-        new DialogoTienda(ventanaActiva(), controlador).setVisible(true);
     }
 
     /** Abre el inventario. */

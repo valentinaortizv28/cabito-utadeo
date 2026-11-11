@@ -39,7 +39,7 @@ public class DialogoMundos extends DialogoLista {
         Partida partida = controlador.getPartida();
         for (Mundo mundo : partida.getMundos()) {
             boolean desbloqueado = partida.estaDesbloqueado(mundo);
-            boolean actual = mundo == partida.getMundoActual();
+            boolean actual = mundo == partida.getMundoActual() && !partida.isEnTienda();
             String html = "<b>" + mundo.getNombre() + "</b>  —  " + mundo.getDescripcion()
                     + "<br>Actividad: " + mundo.getNombreActividad()
                     + "  ·  Nivel requerido: " + mundo.getNivelRequerido()
