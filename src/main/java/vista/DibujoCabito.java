@@ -8,6 +8,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.util.Set;
 
 import javax.swing.JComponent;
 import javax.swing.Timer;
@@ -22,7 +23,8 @@ import modelo.Estado;
  *   <li>Una caminata: Cabito entra caminando desde la izquierda al cambiar de mundo.</li>
  * </ul>
  * También se puede fijar una pose mientras dura algo (por ejemplo, correr
- * durante un minijuego).
+ * durante un minijuego). Los accesorios puestos se dibujan encima con
+ * {@link AccesoriosCabito}.
  * <p>
  * Las imágenes se escalan con interpolación bilineal para que se vean
  * suaves. Todas las poses usan la misma escala (calculada con un tamaño de
@@ -48,6 +50,7 @@ public class DibujoCabito extends JComponent {
     private static final double ALTURA_PASO = 6;
 
     private Estado estado = Estado.NORMAL;
+    private Set<String> accesorios = Set.of();
     private Pose poseFija;
     private Pose poseTemporal;
     /** 0 = Cabito en su sitio; 1 = Cabito justo afuera, a la izquierda. */
@@ -83,6 +86,23 @@ public class DibujoCabito extends JComponent {
     public void setEstado(Estado estado) {
         this.estado = estado;
         repaint();
+    }
+
+    /**
+     * Cambia los accesorios que se dibujan sobre Cabito.
+     *
+     * @param equipados nombres de los accesorios puestos
+     */
+    public void setAccesorios(Set<String> equipados) {
+        this.accesorios = Set.copyOf(equipados);
+        repaint();
+    }
+
+    /**
+     * @return los accesorios que se están dibujando
+     */
+    public Set<String> getAccesorios() {
+        return accesorios;
     }
 
     /**
@@ -269,7 +289,14 @@ public class DibujoCabito extends JComponent {
         int altoSombra = Math.max(6, (int) (16 * escala));
         g2.fillOval(x + (ancho - anchoSombra) / 2, piso - altoSombra / 2, anchoSombra, altoSombra);
 
+        // Accesorios: se dibujan en píxeles de la imagen, con la misma escala que Cabito.
+        Graphics2D capa = (Graphics2D) g2.create();
+        capa.translate(x, y);
+        capa.scale(escala, escala);
+        AccesoriosCabito.dibujarDetras(capa, pose, accesorios, imagen.getWidth(), imagen.getHeight());
         g2.drawImage(imagen, x, y, ancho, alto, null);
+        AccesoriosCabito.dibujarDelante(capa, pose, accesorios, imagen.getWidth(), imagen.getHeight());
+        capa.dispose();
 
         if (estado == Estado.DORMIDO && pose == Pose.ACOSTADO) {
             dibujarZetas(g2, x + ancho * 0.72, y + alto * 0.12, escala);

@@ -297,6 +297,21 @@ public class JuegoController {
     }
 
     /**
+     * Se quita un accesorio que tiene puesto.
+     *
+     * @param nombre nombre del accesorio
+     * @return el mensaje que dijo Cabito, para mostrarlo también en el inventario
+     */
+    public String quitarAccesorio(String nombre) {
+        if (partida == null) {
+            return "";
+        }
+        String exito = "Listo, me quité: " + nombre + ".";
+        String fallo = "Ahora no puedo quitarme eso. " + descripcionEstado();
+        return ejecutar(() -> partida.quitarAccesorio(nombre), exito, fallo) ? exito : fallo;
+    }
+
+    /**
      * Compra un objeto en la Tienda Tadeísta.
      *
      * @param nombre nombre del objeto

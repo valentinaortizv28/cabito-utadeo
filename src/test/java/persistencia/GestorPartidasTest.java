@@ -171,6 +171,49 @@ class GestorPartidasTest {
     }
 
     @Test
+    @DisplayName("Los accesorios puestos y quitados se guardan y se cargan tal cual")
+    void accesoriosPuestosYQuitados() throws Exception {
+        Partida partida = new Partida("Moda");
+        Cabito cabito = partida.getCabito();
+        cabito.setNivel(5);
+        cabito.getInventario().setMonedas(1000);
+        for (String accesorio : new String[] {Catalogo.GORRA, Catalogo.SACO, Catalogo.TERMO, Catalogo.MOCHILA}) {
+            partida.comprar(accesorio);
+            partida.usarItem(accesorio);
+        }
+        partida.quitarAccesorio(Catalogo.TERMO);
+        partida.quitarAccesorio(Catalogo.SACO);
+        gestor.guardar(partida);
+
+        Inventario cargado = gestor.cargar("Moda").getCabito().getInventario();
+        assertTrue(cargado.estaEquipado(Catalogo.GORRA));
+        assertTrue(cargado.estaEquipado(Catalogo.MOCHILA));
+        assertFalse(cargado.estaEquipado(Catalogo.TERMO));
+        assertFalse(cargado.estaEquipado(Catalogo.SACO));
+        assertTrue(cargado.tiene(Catalogo.TERMO), "el accesorio quitado sigue en el inventario");
+        assertTrue(cargado.tieneBonus(Bonus.FELICIDAD_LENTA));
+        assertTrue(cargado.tieneBonus(Bonus.MONEDAS_EXTRA));
+        assertFalse(cargado.tieneBonus(Bonus.ENERGIA_LENTA));
+    }
+
+    @Test
+    @DisplayName("Después de cargar, quitarse el saco resta su felicidad una sola vez")
+    void quitarSacoDespuesDeCargar() throws Exception {
+        Partida partida = new Partida("Saco");
+        partida.getCabito().setNivel(3);
+        partida.getCabito().getInventario().setMonedas(500);
+        partida.comprar(Catalogo.SACO);
+        partida.usarItem(Catalogo.SACO);
+        partida.getCabito().setFelicidad(70);
+        gestor.guardar(partida);
+
+        Partida cargada = gestor.cargar("Saco");
+        assertEquals(70, cargada.getCabito().getFelicidad());
+        assertTrue(cargada.quitarAccesorio(Catalogo.SACO));
+        assertEquals(60, cargada.getCabito().getFelicidad());
+    }
+
+    @Test
     @DisplayName("Si Cabito estaba dormido, sigue dormido al cargar")
     void dormidoSeConserva() throws Exception {
         Partida original = new Partida("Dormilón");

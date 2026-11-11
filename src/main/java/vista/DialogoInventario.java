@@ -19,8 +19,9 @@ import modelo.items.Juguete;
 /**
  * Inventario: una cuadrícula de casillas ({@link CasillaItem}), una por cada
  * objeto que tiene Cabito, con su ícono, su nombre, la cantidad y un botón
- * para comer, usar o equipar según el tipo. Los objetos que no se tienen no
- * aparecen.
+ * para comer o usar según el tipo. Los accesorios tienen un botón Poner o
+ * Quitar, y los que están puestos se marcan con borde teal y un check. Los
+ * objetos que no se tienen no aparecen.
  */
 public class DialogoInventario extends DialogoLista {
 
@@ -79,19 +80,32 @@ public class DialogoInventario extends DialogoLista {
         boolean equipado = inventario.estaEquipado(nombre);
         String textoBoton;
         boolean habilitado = true;
+        Runnable accion = () -> usar(nombre);
         if (item instanceof Comida) {
             textoBoton = "Comer";
         } else if (item instanceof Accesorio) {
-            habilitado = !equipado;
-            textoBoton = equipado ? "Equipado" : "Equipar";
+            textoBoton = equipado ? "Quitar" : "Poner";
+            if (equipado) {
+                accion = () -> quitar(nombre);
+            }
         } else if (item instanceof Juguete) {
             habilitado = false;
             textoBoton = "Automático";
         } else {
             textoBoton = "Usar";
         }
-        return new CasillaItem(item, inventario.getCantidad(nombre), equipado, textoBoton, habilitado,
-                () -> usar(nombre));
+        return new CasillaItem(item, inventario.getCantidad(nombre), equipado, textoBoton, habilitado, accion);
+    }
+
+    /**
+     * Se quita un accesorio, muestra lo que dijo Cabito y actualiza la cuadrícula.
+     *
+     * @param nombre nombre del accesorio
+     */
+    private void quitar(String nombre) {
+        String respuesta = controlador.quitarAccesorio(nombre);
+        setMensaje(respuesta, !respuesta.startsWith("Ahora no"));
+        refrescar();
     }
 
     /**

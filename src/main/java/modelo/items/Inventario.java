@@ -233,6 +233,23 @@ public class Inventario {
     }
 
     /**
+     * Quita un accesorio equipado y deshace su efecto inmediato. Desde ese
+     * momento su bonus continuo deja de contar.
+     *
+     * @param nombre nombre del accesorio
+     * @param cabito la mascota que se lo quita
+     * @return {@code false} si no estaba equipado
+     */
+    public boolean desequipar(String nombre, Cabito cabito) {
+        if (!estaEquipado(nombre)) {
+            return false;
+        }
+        equipados.remove(nombre);
+        ((Accesorio) Catalogo.buscar(nombre)).quitar(cabito);
+        return true;
+    }
+
+    /**
      * @param nombre nombre del accesorio
      * @return {@code true} si está equipado
      */
