@@ -11,6 +11,7 @@ import java.util.Random;
 import minijuegos.Minijuego;
 import minijuegos.MinijuegoMemoria;
 import minijuegos.MinijuegoPreguntas;
+import modelo.items.Accesorio;
 import modelo.items.Catalogo;
 import modelo.items.Item;
 import modelo.items.ResultadoCompra;
@@ -159,7 +160,22 @@ public class Partida {
         if (!cabito.usarItem(nombre)) {
             return false;
         }
-        historial.registrar("Usaste: " + nombre + ".");
+        boolean esAccesorio = Catalogo.buscar(nombre) instanceof Accesorio;
+        historial.registrar((esAccesorio ? "Te pusiste: " : "Usaste: ") + nombre + ".");
+        return true;
+    }
+
+    /**
+     * Se quita un accesorio puesto y lo anota en el historial.
+     *
+     * @param nombre nombre del accesorio
+     * @return {@code true} si se lo quitó
+     */
+    public boolean quitarAccesorio(String nombre) {
+        if (!cabito.quitarAccesorio(nombre)) {
+            return false;
+        }
+        historial.registrar("Te quitaste: " + nombre + ".");
         return true;
     }
 

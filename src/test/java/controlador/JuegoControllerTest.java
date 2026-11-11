@@ -214,6 +214,18 @@ class JuegoControllerTest {
     }
 
     @Test
+    @DisplayName("Quitarse un accesorio desde el controlador")
+    void quitarAccesorio() {
+        Cabito cabito = empezar();
+        cabito.getInventario().setMonedas(200);
+        controlador.comprar(Catalogo.GORRA);
+        controlador.usarItem(Catalogo.GORRA);
+        assertEquals("Listo, me quité: Gorra UTadeo.", controlador.quitarAccesorio(Catalogo.GORRA));
+        assertFalse(cabito.getInventario().estaEquipado(Catalogo.GORRA));
+        assertTrue(controlador.quitarAccesorio(Catalogo.GORRA).startsWith("Ahora no"));
+    }
+
+    @Test
     @DisplayName("usarItem devuelve el mensaje de Cabito")
     void usarItem() {
         Cabito cabito = empezar();

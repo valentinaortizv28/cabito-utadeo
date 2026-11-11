@@ -285,6 +285,21 @@ public class Cabito {
         return usado;
     }
 
+    /**
+     * Se quita un accesorio que tiene puesto. Dormido no puede; enfermo sí.
+     *
+     * @param nombre nombre del accesorio
+     * @return {@code true} si se lo quitó
+     */
+    public boolean quitarAccesorio(String nombre) {
+        if (estado.soloPermiteDespertar()) {
+            return false;
+        }
+        boolean quitado = inventario.desequipar(nombre, this);
+        actualizarEstado();
+        return quitado;
+    }
+
     // ------------------------------------------------------------------
     // Experiencia y niveles
     // ------------------------------------------------------------------

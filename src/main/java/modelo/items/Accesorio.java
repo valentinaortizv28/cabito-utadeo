@@ -3,8 +3,10 @@ package modelo.items;
 import modelo.Cabito;
 
 /**
- * Accesorio permanente que Cabito se equipa. Puede dar un efecto inmediato
- * al equiparlo y un {@link Bonus} continuo mientras está equipado.
+ * Accesorio permanente que Cabito se pone y se quita. Puede dar un efecto
+ * inmediato al ponérselo (que se deshace al quitárselo) y un {@link Bonus}
+ * continuo mientras lo tiene puesto. Así el bonus solo cuenta mientras el
+ * accesorio está puesto.
  */
 public class Accesorio extends Item {
 
@@ -36,6 +38,17 @@ public class Accesorio extends Item {
     @Override
     public void aplicar(Cabito cabito) {
         cabito.setFelicidad(cabito.getFelicidad() + felicidadAlEquipar);
+    }
+
+    /**
+     * Deshace el efecto inmediato al quitarse el accesorio. Por ejemplo, el
+     * Saco da +10 de felicidad al ponerlo y la resta al quitarlo, así no se
+     * puede ganar felicidad poniéndolo y quitándolo muchas veces.
+     *
+     * @param cabito la mascota que se lo quita
+     */
+    public void quitar(Cabito cabito) {
+        cabito.setFelicidad(cabito.getFelicidad() - felicidadAlEquipar);
     }
 
     /**

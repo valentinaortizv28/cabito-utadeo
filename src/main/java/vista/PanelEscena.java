@@ -104,6 +104,7 @@ public class PanelEscena extends JPanel {
         mundo = partida.getMundoActual();
 
         dibujo.setEstado(estado);
+        dibujo.setAccesorios(cabito.getInventario().getEquipados());
 
         boolean despierto = !estado.soloPermiteDespertar();
         configurar(botonAlimentar, despierto, "Cabito está dormido");

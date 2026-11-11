@@ -25,7 +25,8 @@ import modelo.items.Item;
  * <p>
  * El fondo redondeado y la etiqueta de cantidad se pintan a mano: el fondo
  * en {@link #paintComponent} (debajo de todo) y la etiqueta en
- * {@link #paintChildren} (encima del ícono).
+ * {@link #paintChildren} (encima del ícono). Si es un accesorio puesto,
+ * el borde es teal y aparece un check en la esquina superior izquierda.
  */
 public class CasillaItem extends JPanel {
 
@@ -123,7 +124,29 @@ public class CasillaItem extends JPanel {
         g2.setColor(Color.WHITE);
         g2.drawString(textoCantidad, x + (ancho - metricas.stringWidth(textoCantidad)) / 2,
                 y + (alto + metricas.getAscent() - metricas.getDescent()) / 2);
+        if (equipado) {
+            dibujarCheck(g2, 8, 8, alto);
+        }
         g2.dispose();
+    }
+
+    /**
+     * Dibuja un check blanco dentro de un círculo teal (accesorio puesto).
+     */
+    private void dibujarCheck(Graphics2D g2, int x, int y, int tamano) {
+        g2.setColor(Estilo.TEAL);
+        g2.fillOval(x, y, tamano, tamano);
+        g2.setColor(Color.WHITE);
+        g2.setStroke(new BasicStroke(3f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2.drawPolyline(new int[] {x + tamano / 4, x + tamano * 5 / 12, x + tamano * 3 / 4},
+                new int[] {y + tamano / 2, y + tamano * 2 / 3, y + tamano / 3}, 3);
+    }
+
+    /**
+     * @return {@code true} si la casilla muestra un accesorio puesto
+     */
+    public boolean isEquipado() {
+        return equipado;
     }
 
     /**
